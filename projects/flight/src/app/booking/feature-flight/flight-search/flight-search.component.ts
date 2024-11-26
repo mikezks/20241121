@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FlightService } from '../../api-boarding';
 import { Flight, FlightFilter } from '../../logic-flight';
@@ -35,34 +35,7 @@ export class FlightSearchComponent {
   protected flights: Flight[] = [];
 
   constructor() {
-    effect(() => {
-      const route = this.route();
-      untracked(() => this.logRoute(route));
-    });
-
-    console.log(this.filter().from);
-    this.filter.update(value => ({ ...value, from: 'Athen' }));
-    console.log(this.filter().from);
-    this.filter.update(value => ({ ...value, from: 'Barcelona' }));
-    console.log(this.filter().from);
-    this.filter.update(value => ({ ...value, from: 'Frankfurt' }));
-    console.log(this.filter().from);
-    this.filter.update(value => ({ ...value, from: 'Dublin' }));
-    console.log(this.filter().from);
-    this.filter.update(value => ({ ...value, from: 'Oslo' }));
-    console.log(this.filter().from);
-    this.filter.update(value => ({ ...value, from: 'Madrid' }));
-    console.log(this.filter().from);
-
-    // Glitch-free mode
-    const counter = signal(0);
-    counter.update(num => num + 1);
-    const isEven = computed(() => counter() % 2 === 0);
-    effect(() => console.log(counter(), 'gerade:', isEven()));
-  }
-
-  protected logRoute(route: string): void {
-    console.log(route);
+    effect(() => console.log(this.route()));
   }
 
   protected search(filter: FlightFilter): void {
