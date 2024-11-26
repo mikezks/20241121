@@ -25,7 +25,7 @@ export const CHECKIN_ROUTES: Routes = [
           },
           {
             path: 'edit/:id',
-            component: PassengerEditComponent
+            component: PassengerEditComponent,
           }
         ]
       }

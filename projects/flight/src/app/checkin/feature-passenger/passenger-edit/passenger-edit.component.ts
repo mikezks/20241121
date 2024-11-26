@@ -1,7 +1,12 @@
+import { initialPassenger, Passenger } from './../../logic-passenger/model/passenger';
 import { NgIf } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject, input, numberAttribute, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { validatePassengerStatus } from '../../util-validation';
+import { PassengerService } from '../../logic-passenger/data-access/passenger.service';
+import { switchMap } from 'rxjs';
+import { RouterLink } from '@angular/router';
 
 
 @Component({
@@ -9,11 +14,16 @@ import { validatePassengerStatus } from '../../util-validation';
   standalone: true,
   imports: [
     NgIf,
+    RouterLink,
     ReactiveFormsModule
   ],
   templateUrl: './passenger-edit.component.html'
 })
 export class PassengerEditComponent {
+  private passengerService = inject(PassengerService);
+
+  readonly id = input.required<number, string>({ transform: numberAttribute });
+
   protected editForm = inject(NonNullableFormBuilder).group({
     id: [0],
     firstName: [''],
@@ -23,6 +33,18 @@ export class PassengerEditComponent {
       validatePassengerStatus(['A', 'B', 'C'])
     ]]
   });
+
+  readonly id$ = toObservable(this.id);
+  readonly passenger$ = this.id$.pipe(
+    switchMap(id => this.passengerService.findById(id))
+  );
+  readonly passenger = toSignal(this.passenger$, {
+    initialValue: initialPassenger
+  });
+
+  constructor() {
+    effect(() => this.editForm.patchValue(this.passenger()));
+  }
 
   protected save(): void {
     console.log(this.editForm.value);
