@@ -22,14 +22,39 @@ export class DepatureComponent {
   loading = false;
 
   initFlightsStream(): Observable<Flight[]> {
+    /* const state = [{
+      id: 9,
+      from: 'Paris',
+      to: 'London',
+      date: new Date().toISOString(),
+      delayed: true
+    }];
+
+    type FlightState = {
+      flights: Flight[];
+      status: 'init' | 'loading' | 'loaded' | 'error';
+    }
+
+    const state2: FlightState = {
+      flights: [{
+        id: 9,
+        from: 'Paris',
+        to: 'London',
+        date: new Date().toISOString(),
+        delayed: true
+      }],
+      status: 'init' // 'loading', 'loaded', 'error'
+    }; */
+
     return this.control.valueChanges.pipe(
+      tap(v => console.log(v)),
       filter(airport => airport.length > 2),
       debounceTime(300),
       distinctUntilChanged(),
       tap(() => this.loading = true),
       switchMap(airport => this.load(airport)),
       tap(() => this.loading = false)
-    )
+    );
   }
 
   load(airport: string): Observable<Flight[]> {
