@@ -44,7 +44,14 @@ export const BookingStore = signalStore(
    * Updater
    */
   withMethods(store => ({
+    setFilter: (filter: FlightFilter) => patchState(store, { filter }),
     setFlights: (flights: Flight[]) => patchState(store, { flights }),
+    setBasketId: (id: number, selected: boolean) => patchState(store, state => ({
+      basket: {
+        ...state.basket,
+        [id]: selected
+      }
+    })),
     resetFlights: () => patchState(store, { flights: [] }),
   })),
   /**
@@ -55,6 +62,10 @@ export const BookingStore = signalStore(
     flightService = inject(FlightService)
   ) => ({
     loadFlights: (filter: FlightFilter) => {
+      if (!filter.from || !filter.to) {
+        return;
+      }
+
       flightService.find(filter.from, filter.to, filter.urgent)
         .subscribe(flights => store.setFlights(flights));
     }
