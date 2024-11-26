@@ -25,7 +25,13 @@ const initialBookingState: BookingState = {
 
 export const BookingStore = signalStore(
   { providedIn: 'root' },
+  /**
+   * State Definition
+   */
   withState(initialBookingState),
+  /**
+   * Derived State
+   */
   withComputed(store => ({
     selectedFlights: computed(
       () => store.flights().filter(flight => store.basket()[flight.id])
@@ -34,15 +40,23 @@ export const BookingStore = signalStore(
       () => store.flights().filter(flight => flight.delayed)
     ),
   })),
+  /**
+   * Updater
+   */
+  withMethods(store => ({
+    setFlights: (flights: Flight[]) => patchState(store, { flights }),
+    resetFlights: () => patchState(store, { flights: [] }),
+  })),
+  /**
+   * Side-Effects
+   */
   withMethods((
     store,
     flightService = inject(FlightService)
   ) => ({
-    setFlights: (flights: Flight[]) => patchState(store, { flights }),
-    resetFlights: () => patchState(store, { flights: [] }),
     loadFlights: (filter: FlightFilter) => {
       flightService.find(filter.from, filter.to, filter.urgent)
-        .subscribe(flights => patchState(store, { flights }))
+        .subscribe(flights => store.setFlights(flights));
     }
-  }))
+  })),
 );
