@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, Injector, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Flight, FlightFilter } from '../../logic-flight';
 import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
@@ -19,6 +19,7 @@ import { FlightService } from '../../api-boarding';
 })
 export class FlightSearchComponent {
   private flightService = inject(FlightService);
+  private injector = inject(Injector);
 
   protected filter = signal({
     from: 'London',
@@ -41,6 +42,9 @@ export class FlightSearchComponent {
   }
 
   protected search(filter: FlightFilter): void {
+    /* effect(() => {
+      console.log(this.route());
+    }, { injector: this.injector }); */
     this.filter.set(filter);
 
     if (!this.filter().from || !this.filter().to) {
