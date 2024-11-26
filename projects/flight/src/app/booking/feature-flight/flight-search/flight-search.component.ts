@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FlightService } from '../../api-boarding';
-import { Flight, FlightFilter } from '../../logic-flight';
+import { BookingStore, Flight, FlightFilter } from '../../logic-flight';
 import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
 
 
@@ -19,6 +19,7 @@ import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
 })
 export class FlightSearchComponent {
   private flightService = inject(FlightService);
+  private store = inject(BookingStore);
 
   protected filter = signal({
     from: 'London',
@@ -36,6 +37,8 @@ export class FlightSearchComponent {
 
   constructor() {
     effect(() => console.log(this.route()));
+
+    this.store.flights();
   }
 
   protected search(filter: FlightFilter): void {
