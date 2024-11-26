@@ -1,4 +1,7 @@
-@let flights = flightResult();
+@let filter = store.filter();
+@let route = store.route();
+@let basket = store.basket();
+@let flights = store.flights();
 
 <div class="card">
   <div class="card-header">
@@ -8,18 +11,18 @@
   <div class="card-body">
 
     <app-flight-filter
-      [filter]="filter()"
-      (searchTrigger)="search($event)"
+      [filter]="filter"
+      (searchTrigger)="store.setFilter($event)"
     >
       <div *ngIf="flights.length" class="flight-filter-info">
         {{ flights.length }} flights found!
       </div>
-      <button *ngIf="flights.length" (click)="reset()"
+      <button *ngIf="flights.length" (click)="store.resetFlights()"
         class="btn btn-default flight-filter-button"
       >Reset</button>
     </app-flight-filter>
 
-    <p>{{ route() }}</p>
+    <p>{{ route }}</p>
   </div>
 </div>
 
@@ -28,8 +31,8 @@
     <div class="col-xs-12 col-sm-6 col-md-4">
       <app-flight-card
         [item]="flight"
-        [selected]="basket()[flight.id]"
-        (selectedChange)="updateBasket(flight.id, $event)"
+        [selected]="basket[flight.id]"
+        (selectedChange)="store.setBasketId(flight.id, $event)"
         (delayTrigger)="delay($event)"
       />
     </div>
@@ -42,6 +45,6 @@
   </div>
 
   <div class="card-body">
-    <pre>{{ basket() | json }}</pre>
+    <pre>{{ basket | json }}</pre>
   </div>
 </div>
