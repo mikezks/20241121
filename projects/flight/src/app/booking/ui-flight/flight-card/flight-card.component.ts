@@ -55,13 +55,6 @@ export class FlightCardComponent implements OnInit, OnDestroy {
   readonly selected = model(false);
   readonly delayTrigger = output<Flight>();
 
-  constructor() {
-    const logEffect = effect(() => {
-      console.log(this.item());
-      logEffect.destroy();
-    });
-  }
-
   ngOnInit(): void {
     console.log('%cFlight Card INIT ' + this.item().id, 'color: green;')
   }
