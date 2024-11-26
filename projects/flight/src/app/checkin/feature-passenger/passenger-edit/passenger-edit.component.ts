@@ -22,8 +22,6 @@ import { HttpClient } from '@angular/common/http';
 })
 export class PassengerEditComponent {
   private passengerService = inject(PassengerService);
-  private http = inject(HttpClient);
-  private injector = inject(Injector);
 
   readonly id = input.required<number, string>({ transform: numberAttribute });
 
@@ -49,14 +47,5 @@ export class PassengerEditComponent {
 
   protected save(): void {
     console.log(this.editForm.value);
-
-    /* const passengerCall = toSignal(this.http.get<Passenger[]>('https://demo.angulararchitects.io/api/passenger?name=Smith'), {
-      initialValue: [],
-      injector: this.injector
-    });
-    effect(() => console.log(passengerCall()), {
-      injector: this.injector,
-      allowSignalWrites: true
-    }); */
   }
 }
