@@ -32,7 +32,7 @@ export class FlightSearchComponent {
     3: true,
     5: true
   };
-  protected flights: Flight[] = [];
+  protected flightResult = this.flightService.flights;
 
   constructor() {
     effect(() => console.log(this.route()));
@@ -47,9 +47,7 @@ export class FlightSearchComponent {
 
     this.flightService.find(
       this.filter().from, this.filter().to, this.filter().urgent
-    ).subscribe(
-      flights => this.flights = flights
-    );
+    ).subscribe();
   }
 
   protected delay(flight: Flight): void {
@@ -63,12 +61,14 @@ export class FlightSearchComponent {
       delayed: true
     };
 
-    this.flights = this.flights.map(
-      flight => flight.id === newFlight.id ? newFlight : flight
+    this.flightService.setFlights(
+      this.flightResult().map(
+        flight => flight.id === newFlight.id ? newFlight : flight
+      )
     );
   }
 
   protected reset(): void {
-    this.flights = [];
+    this.flightService.setFlights([]);
   }
 }

@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Flight } from '../model/flight';
 
@@ -10,10 +10,15 @@ import { Flight } from '../model/flight';
 export class FlightService {
   private http = inject(HttpClient);
 
-  flights: Flight[] = [];
+  private flightState = signal<Flight[]>([]);
+  flights = this.flightState.asReadonly();
   private flightsCountState = new BehaviorSubject<number>(0);
   flightsCount$ = this.flightsCountState.asObservable();
   private baseUrl = `https://demo.angulararchitects.io/api`;
+
+  setFlights(flights: Flight[]): void {
+    this.flightState.set(flights);
+  }
 
   load(from: string, to: string, urgent: boolean): void {
     this.find(from, to, urgent).subscribe({
@@ -36,7 +41,7 @@ export class FlightService {
     const headers = new HttpHeaders().set('Accept', 'application/json');
 
     return this.http.get<Flight[]>(url, { params, headers }).pipe(
-      tap(flights => this.flights = flights),
+      tap(flights => this.flightState.set(flights)),
       tap(flights => this.flightsCountState.next(flights.length)),
     );
   }
@@ -57,7 +62,7 @@ export class FlightService {
   delay() {
     const ONE_MINUTE = 1000 * 60;
 
-    const oldFlights = this.flights;
+    const oldFlights = this.flights();
     const oldFlight = oldFlights[0];
     const oldDate = new Date(oldFlight.date);
 

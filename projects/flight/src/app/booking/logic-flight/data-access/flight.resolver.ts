@@ -8,7 +8,7 @@ import { Flight } from "../model/flight";
 export const resolveFlights = (route: ActivatedRouteSnapshot): Observable<Flight> => {
   const flightService = inject(FlightService);
   const id = +(route.paramMap.get('id') ?? 0);
-  const flight = flightService.flights.find(f => f.id === id);
+  const flight = flightService.flights().find(f => f.id === id);
 
   return flight ? of(flight) : flightService.findById(id);
 };
