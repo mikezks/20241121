@@ -15,6 +15,9 @@ import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
   ],
   selector: 'app-flight-search',
   templateUrl: './flight-search.component.html',
+  providers: [
+    // BookingStore
+  ]
 })
 export class FlightSearchComponent {
   protected store = inject(BookingStore);
