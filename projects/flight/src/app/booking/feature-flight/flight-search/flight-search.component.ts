@@ -23,7 +23,7 @@ export class FlightSearchComponent {
   protected store = inject(BookingStore);
 
   protected delay(flight: Flight): void {
-    this.store.updateFlight({
+    this.store.saveFlightUpdate({
       ...flight,
       date: new Date(new Date(flight.date).getTime() + 1000 * 60 * 5).toISOString(),
       delayed: true
