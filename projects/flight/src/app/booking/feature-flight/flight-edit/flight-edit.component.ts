@@ -1,44 +1,81 @@
-import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { routerFeature } from '../../../shared/logic-router-state';
-import { initialFlight } from '../../logic-flight';
+import { Component, Input, effect, inject, input, numberAttribute } from '@angular/core';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { BookingStore, Flight, initialFlight } from '../../logic-flight';
 
 
 @Component({
   selector: 'app-flight-edit',
   standalone: true,
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterLink
   ],
   templateUrl: './flight-edit.component.html'
 })
-export class FlightEditComponent implements OnChanges {
-  private store = inject(Store);
+export class FlightEditComponent {
+  private store = inject(BookingStore);
 
+  protected id = input.required<number, string>({ transform: numberAttribute});
   @Input() flight = initialFlight;
 
   protected editForm = inject(NonNullableFormBuilder).group({
     id: [0],
-    from: [''],
+    from: ['', [
+      Validators.minLength(5)
+    ]],
     to: [''],
     date: [new Date().toISOString()],
     delayed: [false]
   });
 
   constructor() {
-    this.store.select(routerFeature.selectRouteParams).subscribe(
-      params => console.log(params)
+    this.store.setActiveId(this.id);
+
+    effect(() => {
+      const activeFlight = this.store.activeFlight();
+      // Form is not updated if there are active changes.
+      // Refactoring option: avoid navigation is this case (Router Guard).
+      if (this.editForm.pristine) {
+        this.editForm.patchValue(activeFlight);
+      } else {
+        console.log('Flight update was not written to the form', activeFlight);
+      }
+    });
+
+    // Demo: more performant EntityState data type
+    const entityStateFlight: {
+      entities: Record<number, Flight>,
+      ids: number[]
+    } = {
+      entities: {
+        3: {
+          id: 3,
+          from: 'Hamburg',
+          to: 'Graz',
+          date: '',
+          delayed: false
+        },
+        5: {
+          id: 5,
+          from: 'Hamburg',
+          to: 'Graz',
+          date: '',
+          delayed: false
+        },
+      },
+      ids: [5, 3]
+    };
+
+    entityStateFlight.entities[4];
+    const flights = entityStateFlight.ids.map(
+      id => entityStateFlight.entities[id]
     );
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['flight'].previousValue !== changes['flight'].currentValue) {
-      this.editForm.patchValue(this.flight);
-    }
-  }
-
   protected save(): void {
-    console.log(this.editForm.value);
+    this.store.saveFlightUpdate(
+      this.editForm.getRawValue()
+    );
   }
 }
