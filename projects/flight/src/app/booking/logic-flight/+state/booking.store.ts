@@ -80,7 +80,7 @@ export const BookingStore = signalStore(
       flightService.find(filter.from, filter.to, filter.urgent)
         .subscribe(flights => store.setFlights(flights));
     },
-    loadRxFlights: rxMethod<FlightFilter>(pipe(
+    _loadRxFlights: rxMethod<FlightFilter>(pipe(
       switchMap(filter => flightService.find(
         filter.from, filter.to, filter.urgent
       )),
@@ -91,6 +91,6 @@ export const BookingStore = signalStore(
     ))
   })),
   withHooks({
-    onInit: store => store.loadRxFlights(store.filter)
+    onInit: store => store._loadRxFlights(store.filter)
   })
 );
